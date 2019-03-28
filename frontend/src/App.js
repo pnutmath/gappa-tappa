@@ -1,13 +1,26 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import './App.scss';
 import { connect, sendMsg } from "./api"
+import Header from "./components/Header"
+import ChatHistory from './components/ChatHistory/ChatHistory';
 
 class App extends Component {
 
   constructor(props) {
     super(props);
-    connect();
+    this.state = {
+      chatHistory: []
+    };
+  }
+
+  componentDidMount() {
+    connect((msg) => {
+      console.log("New Message");
+      this.setState(prevState => ({
+        chatHistory: [...this.state.chatHistory, msg]
+      }))
+      console.log(this.state);
+    });
   }
 
   send() {
@@ -18,11 +31,11 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+        <Header />
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-
           <button onClick={this.send} className="btn">Send Message</button>
         </header>
+        <ChatHistory chatHistory={this.state.chatHistory} />
       </div>
     );
   }
