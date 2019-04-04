@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import './App.scss';
 import { connect, sendMsg } from "./api"
 import Header from "./components/Header"
-import ChatHistory from './components/ChatHistory/ChatHistory';
+import ChatHistory from './components/ChatHistory';
+import ChatInput from './components/ChatInput';
 
 class App extends Component {
 
@@ -23,9 +24,11 @@ class App extends Component {
     });
   }
 
-  send() {
-    console.log('Hello');
-    sendMsg('Hello');
+  send(event) {
+    if (event.keyCode === 13) {
+      sendMsg(event.target.value);
+      event.target.value = "";
+    }
   }
 
   render() {
@@ -36,6 +39,7 @@ class App extends Component {
           <button onClick={this.send} className="btn">Send Message</button>
         </header>
         <ChatHistory chatHistory={this.state.chatHistory} />
+        <ChatInput send={this.send} />
       </div>
     );
   }
