@@ -8,7 +8,6 @@ let connect = cb => {
     }
 
     socket.onmessage = msg => {
-        console.log(msg);
         cb(msg);
     }
 
@@ -17,7 +16,7 @@ let connect = cb => {
     }
 
     socket.onerror = error => {
-        console.log("Socket error: ", error);
+        console.error("Socket error: ", error);
     };
 };
 
