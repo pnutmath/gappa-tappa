@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/pnutdev/gappa-tappa/backend/pkg/websocket"
+	"github.com/pnutmath/gappa-tappa/backend/pkg/websocket"
 )
 
 func serveWs(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {

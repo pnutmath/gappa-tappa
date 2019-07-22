@@ -2,6 +2,8 @@ package websocket
 
 import "fmt"
 
+// Pool maintains the set of active clients and broadcasts messages to the
+// clients.
 type Pool struct {
 	Register   chan *Client
 	Unregister chan *Client
