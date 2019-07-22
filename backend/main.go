@@ -1,45 +1,36 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"os"
+	"time"
 
-	"github.com/pnutmath/gappa-tappa/backend/pkg/websocket"
+	"github.com/gorilla/mux"
+
+	"github.com/pnutmath/gappa-tappa/backend/internal/common"
+	"github.com/pnutmath/gappa-tappa/backend/internal/config"
 )
 
-func serveWs(pool *websocket.Pool, w http.ResponseWriter, r *http.Request) {
-	fmt.Println("WebSocket Endpoint Hit")
-
-	conn, err := websocket.Upgrade(w, r)
-	if err != nil {
-		fmt.Fprintf(w, "%+v\n", err)
-	}
-
-	client := &websocket.Client{
-		Conn: conn,
-		Pool: pool,
-	}
-
-	pool.Register <- client
-	client.Read()
-}
-
-func setupRoute() {
-	pool := websocket.NewPool()
-
-	go pool.Start()
-
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Simple Server")
-	})
-
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		serveWs(pool, w, r)
-	})
-}
-
 func main() {
-	fmt.Println("Gappa Tappa v0.1")
-	setupRoute()
-	http.ListenAndServe(":8080", nil)
+	fmt.Println("Gappa Tappa v0.1: Started")
+	host := os.Getenv("DB_HOST")
+	if host == "" {
+		host = config.DefaultHost
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	client, err := common.Connect(ctx, host)
+	if err != nil {
+		fmt.Printf("Unable to connect DB %v", err)
+	}
+	db := client.Database("gappatappa")
+
+	router := mux.NewRouter()
+
+	common.SetupRoute(router, db)
+
+	http.ListenAndServe(":8080", router)
 }
